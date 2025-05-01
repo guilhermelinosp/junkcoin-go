@@ -34,17 +34,18 @@ type Node struct {
 	logger    *logrus.Logger
 }
 
-func NewNode(ctx context.Context) (*Node, error) {
+func NewNode(ctx context.Context, port string) (*Node, error) {
 	// Generate a new key pair
 	priv, _, err := crypto.GenerateKeyPair(crypto.Ed25519, 256)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate key pair: %w", err)
 	}
 
-	// Create a new libp2p host
+	// Create a new libp2p host with a custom listen address
+	listenAddr := fmt.Sprintf("/ip4/0.0.0.0/tcp/%s", port)
 	h, err := libp2p.New(
 		libp2p.Identity(priv),
-		libp2p.DefaultListenAddrs,
+		libp2p.ListenAddrStrings(listenAddr), // Use the specified port
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create host: %w", err)
