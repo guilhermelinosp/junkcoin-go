@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package node;
+
+option go_package = "github.com/guilhermelinosp/litecoin-go/proto/node";
+
+service NodeService {
+  rpc GetBlockchain(Empty) returns (BlockchainResponse);
+  rpc SendTransaction(Transaction) returns (Ack);
+  rpc SendBlock(Block) returns (Ack);
+  rpc StreamBlocks(Empty) returns (stream Block); // New streaming endpoint
+}
+
+message Empty {}
+
+message BlockchainResponse {
+  repeated Block blocks = 1;
+  int64 current_height = 2;
+}
+
+message Block {
+  int64 timestamp = 1;
+  bytes prev_hash = 2;
+  bytes hash = 3;
+  repeated Transaction transactions = 4;
+  int64 nonce = 5;
+  int64 difficulty = 6;
+}
+
+message Transaction {
+  bytes id = 1;
+  repeated TxInput inputs = 2;
+  repeated TxOutput outputs = 3;
+}
+
+message TxInput {
+  bytes tx_id = 1;
+  int64 out_idx = 2;
+  bytes signature = 3;
+  bytes pub_key = 4;
+}
+
+message TxOutput {
+  int64 value = 1;
+  bytes pub_key_hash = 2;
+}
+
+message Ack {
+  bool success = 1;
+  string message = 2;
+}
